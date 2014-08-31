@@ -6,6 +6,8 @@ Node and npm encourage the use of small, reusable modules, and many npm authors 
 
 `meta-npm` is a meta npm package manager designed to solve this problem by allowing you to easily checkout a top-level project and all of its dependencies, creating any forks as neccessary and handling `npm link`ing them together for local development. It also makes synchronizing changes to the submodules a breeze both on github and the npm registry.
 
+It uses `npm` and `git` under the hood the same way you would if you were developing across multiple modules simultaneously. It just makes this process as easy as it would be if you were working on a single module.
+
 ## install
 
 ```
