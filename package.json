@@ -1,0 +1,39 @@
+{
+  "name": "meta-npm",
+  "description": "Streaming torrent client",
+  "version": "0.2.18",
+  "author": {
+    "name": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "http://feross.org/"
+  },
+  "bin": {
+    "meta-npm": "./bin/cmd.js"
+  },
+  "bugs": {
+    "url": "https://github.com/fisch0920/meta-npm/issues"
+  },
+  "dependencies": {
+    "chalk": "^0.5.1",
+    "minimist": "^1.1.0",
+    "node-git": "0.0.0"
+  },
+  "keywords": [
+    "npm",
+    "package",
+    "git",
+    "link",
+    "meta",
+    "project",
+    "manager"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fisch0920/meta-npm.git"
+  },
+  "scripts": {
+    "start": "./bin/cmd.js"
+  }
+}
