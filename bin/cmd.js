@@ -56,8 +56,8 @@ var metaNPM = new MetaNPM({
   username: argv.username,
   password: argv.password
 }, function (err) {
-  if (command === 'create') {
-    metaNPM.create(argv._[1], {
+  if (command === 'init') {
+    metaNPM.init(argv._[1], {
       users: argv.whitelist.split(',')
     }, function (err) {
       if (err) {

@@ -6,9 +6,9 @@ var npm       = require('npm')
 var async     = require('async')
 var GithubAPI = require('github')
 var ghparse   = require('github-url-to-object')
-var debug     = require('debug')('meta-npm')
-var assert    = require('assert')
 var _         = require('underscore')
+//var debug     = require('debug')('meta-npm')
+//var assert    = require('assert')
 
 function MetaNPM (opts, cb) {
   var self = this
@@ -43,7 +43,7 @@ MetaNPM.prototype.init = function (cb) {
   cb(null)
 }
 
-MetaNPM.prototype.create = function (pkg, opts, cb) {
+MetaNPM.prototype.init = function (pkg, opts, cb) {
   opts = opts || {}
 
   parsePackage(pkg, opts, function (err, pkgs) {
@@ -87,7 +87,9 @@ function parsePackage (pkg, opts, cb) {
     }
 
     var packages = [ info ]
+    var packageMap = { }
     var deps = _.extend(metadata.dependencies, metadata.devDependencies)
+    packageMap[info.https_url] = true
 
     if (!deps) return cb(null, packages)
 
@@ -113,7 +115,11 @@ function parsePackage (pkg, opts, cb) {
       parsePackage(pkg, o, function (err, pkgs) {
         if (!err && pkgs) {
           pkgs.forEach(function (pkg) {
-            packages.push(pkg)
+            var url = pkg.https_url
+            if (!(url in packageMap)) {
+              packageMap[url] = true
+              packages.push(pkg)
+            }
           })
         }
 

@@ -17,6 +17,7 @@ npm install meta-npm
 ## usage
 
 TODO
+node bin/cmd.js -u fisch0920 -p ****** -w feross,fisch0920 init webtorrent
 
 ## todo
 
