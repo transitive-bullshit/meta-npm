@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-var chalk = require('chalk')
+var chalk    = require('chalk')
 var minimist = require('minimist')
-var MetaNPM = require('../')
-var fs = require('fs')
+var fs       = require('fs')
+var MetaNPM  = require('../')
 
 function usage () {
   console.log('Usage: meta-npm [OPTIONS] [COMMAND] [COMMAND-ARGS]')
@@ -37,12 +37,11 @@ if (argv.version) {
   process.exit(0)
 }
 
-/* meta-npm create webtorrent
+/* meta-npm init webtorrent
  * meta-npm fetch
  * meta-npm pull
  * meta-npm push
  * meta-npm pull-request
- *
  */
 
 var command = argv._[0]
@@ -56,18 +55,26 @@ var metaNPM = new MetaNPM({
   username: argv.username,
   password: argv.password
 }, function (err) {
-  if (command === 'init') {
-    metaNPM.init(argv._[1], {
-      users: argv.whitelist.split(',')
-    }, function (err) {
-      if (err) {
-        console.error(err)
-        usage()
-        process.exit(1)
-      } else {
-        process.exit(0)
-      }
-    })
+  if (err) {
+    if (err) {
+      console.error(err)
+      usage()
+      process.exit(1)
+    }
+  } else {
+    if (command === 'init') {
+      metaNPM.init(argv._[1], {
+        users: argv.whitelist.split(',')
+      }, function (err) {
+        if (err) {
+          console.error(err)
+          usage()
+          process.exit(1)
+        } else {
+          process.exit(0)
+        }
+      })
+    }
   }
 })
 

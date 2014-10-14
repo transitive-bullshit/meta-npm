@@ -6,17 +6,19 @@ var npm       = require('npm')
 var async     = require('async')
 var GithubAPI = require('github')
 var ghparse   = require('github-url-to-object')
+var nodegit   = require('nodegit')
+var retry     = require('retry')
 var _         = require('underscore')
-//var debug     = require('debug')('meta-npm')
-//var assert    = require('assert')
+var debug     = require('debug')('meta-npm')
 
 function MetaNPM (opts, cb) {
-  var self = this
+  var self  = this
+  self.opts = opts
 
   self.github = new GithubAPI({
     version: "3.0.0",
     // optional
-    debug: true,
+    debug: false,
     timeout: 5000
   })
 
@@ -44,16 +46,75 @@ MetaNPM.prototype.init = function (cb) {
 }
 
 MetaNPM.prototype.init = function (pkg, opts, cb) {
+  var self = this
   opts = opts || {}
 
   parsePackage(pkg, opts, function (err, pkgs) {
-    if (!err) console.log(pkgs)
-    cb(err, pkgs)
+    if (err) cb(err)
+
+    console.log('found', pkgs.length, 'packages')
+
+    async.eachLimit(pkgs, 1, function (pkg, cb) {
+      if (pkg.user === self.opts.username) {
+        self._clonePackage(pkg, opts, cb)
+      } else {
+        self.github.repos.getForks({
+          user: pkg.user,
+          repo: pkg.repo,
+          per_page: 100
+        }, function (err, forks) {
+          if (err) forks = []
+          forks = forks.filter(function (fork) { return fork.owner.login === self.opts.username })
+
+          function cloneFork (fork) {
+            pkg.user = fork.owner.login
+            pkg.repo = fork.name
+            pkg.https_url = fork.html_url
+            self._clonePackage(pkg, opts, cb)
+          }
+
+          if (forks.length >= 1) {
+            cloneFork(forks[0])
+          } else {
+            console.log("forking repo", pkg.user + "/" + pkg.repo)
+
+            self.github.repos.fork({
+              user: pkg.user,
+              repo: pkg.repo
+            }, function (err, repo) {
+              if (err) return cb(err)
+
+              process.nextTick(function () {
+                cloneFork(repo)
+              })
+            })
+          }
+        })
+      }
+    }, function (err) {
+      if (err) return cb(err)
+
+      cb(null, pkgs)
+    })
+  })
+}
+
+MetaNPM.prototype._clonePackage = function (pkg, opts, cb) {
+  var url = 'git://github.com/' + pkg.user + '/' + pkg.repo + '.git'
+  console.log("cloning repo", url)
+
+  var operation = retry.operation()
+  operation.attempt(function () {
+    nodegit.Repo.clone(url, pkg.repo, null, function (err, repo) {
+      if (operation.retry(err)) return
+
+      cb(err ? operation.mainError() : null, repo)
+    })
   })
 }
 
 function parsePackage (pkg, opts, cb) {
-  console.log('parse', pkg)
+  debug('parse', pkg)
 
   var v = pkg.indexOf('@')
   if (opts.blacklist && (pkg in opts.blacklist || (v >= 0 && pkg.substring(0, v) in opts.blacklist))) {
