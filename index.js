@@ -54,7 +54,8 @@ MetaNPM.prototype.init = function (pkg, opts, cb) {
 
     console.log('found', pkgs.length, 'packages')
 
-    async.eachLimit(pkgs, 1, function (pkg, cb) {
+    // clone / fork each package as necessary
+    async.eachLimit(pkgs, 4, function (pkg, cb) {
       if (pkg.user === self.opts.username) {
         self._clonePackage(pkg, opts, cb)
       } else {
@@ -93,6 +94,12 @@ MetaNPM.prototype.init = function (pkg, opts, cb) {
       }
     }, function (err) {
       if (err) return cb(err)
+
+      // npm link / install packages
+      console.log("npm linking and installing all packages")
+      async.eachLimit(pkgs, 4, function (pkg, cb) {
+        // TODO
+      })
 
       cb(null, pkgs)
     })

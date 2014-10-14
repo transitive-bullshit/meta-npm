@@ -16,13 +16,18 @@ npm install meta-npm
 
 ## usage
 
-TODO
-node bin/cmd.js -u fisch0920 -p ****** -w feross,fisch0920 init webtorrent
+```meta-npm -u fisch0920 -p ****** -w feross,fisch0920 init webtorrent```
+This will recursively find all npm module dependencies of the `webtorrent` project published by `feross` or `fisch0920` that're backed by github repositories and clone / fork them as necessary, `npm link`ing and `npm install`ing the results together for a fresh local development environment.
 
 ## todo
 
 * ~~Create project.~~
-* Decide on project structure.
+* meta-npm init
+* meta-npm fetch
+* meta-npm pull
+* meta-npm push
+* meta-npm pull-request
+    * create PRs for each fork where HEAD is newer than upstream
 
 ## license
 
